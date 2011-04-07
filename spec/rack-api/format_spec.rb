@@ -1,0 +1,110 @@
+require "spec_helper"
+
+describe Rack::API, "Format" do
+   before do
+    Rack::API.app do
+      version :v1 do
+        respond_to :json, :jsonp, :awesome, :fffuuu, :zomg
+        get("/") { {:success => true} }
+        get("users(.:format)") { {:users => []} }
+      end
+    end
+  end
+
+  it "ignores unknown formats" do
+    get "/users.xml"
+    last_response.status.should == 404
+  end
+
+  context "missing formatter" do
+    it "renders 406" do
+      get "/v1/users.zomg"
+
+      last_response.status.should == 406
+      last_response.body.should == "Unknown format"
+      last_response.headers["Content-Type"].should == "text/plain"
+    end
+  end
+
+  context "JSONP" do
+    it "renders when set through query string" do
+      get "/v1", :format => "jsonp"
+
+      last_response.status.should == 200
+      last_response.body.should == %[callback({"success":true});]
+    end
+
+    it "renders when set through extension" do
+      get "/v1/users.jsonp"
+
+      last_response.status.should == 200
+      last_response.body.should == %[callback({"users":[]});]
+    end
+
+    it "sends header" do
+      get "/v1/users.jsonp"
+      last_response.headers["Content-Type"].should == "application/javascript"
+    end
+  end
+
+  context "JSON" do
+    it "renders when set through query string" do
+      get "/v1", :format => "json"
+
+      last_response.status.should == 200
+      JSON.load(last_response.body).should == {"success" => true}
+    end
+
+    it "renders when set through extension" do
+      get "/v1/users.json"
+
+      last_response.status.should == 200
+      JSON.load(last_response.body).should == {"users" => []}
+    end
+
+    it "sends header" do
+      get "/v1/users.json"
+      last_response.headers["Content-Type"].should == "application/json"
+    end
+  end
+
+  context "custom formatter extension" do
+    it "renders when set through query string" do
+      get "/v1", :format => "awesome"
+
+      last_response.status.should == 200
+      last_response.body.should == "U R Awesome"
+    end
+
+    it "renders when set through extension" do
+      get "/v1/users.awesome"
+
+      last_response.status.should == 200
+      last_response.body.should == "U R Awesome"
+    end
+  end
+
+  context "custom formatter class" do
+    before :all do
+      Rack::API::Formatter::Fffuuu = Class.new(Rack::API::Formatter::Base) do
+        def to_format
+          "ZOMG! Fffuuu!"
+        end
+      end
+    end
+
+    it "renders when set through query string" do
+      get "/v1", :format => "fffuuu"
+
+      last_response.status.should == 200
+      last_response.body.should == "ZOMG! Fffuuu!"
+    end
+
+    it "renders when set through extension" do
+      get "/v1/users.fffuuu"
+
+      last_response.status.should == 200
+      last_response.body.should == "ZOMG! Fffuuu!"
+    end
+  end
+end
