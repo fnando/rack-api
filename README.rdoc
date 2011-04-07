@@ -24,6 +24,36 @@ Create web app APIs that respond to one or more formats using an elegant DSL.
     end
   end
 
+=== Rails Integration
+
+First, set up your Gemfile like this:
+
+  gem "rack-api", "~> 0.1.0", :require => "rack/api"
+
+Create your API somewhere. In this example, we'll add it to <tt>lib/api.rb</tt>.
+
+  Rack::API.app do
+    prefix "api"
+
+    version :v1 do
+      get "status(.:format)" do
+        {:success => true, :time => Time.now}
+      end
+    end
+  end
+
+Load this file somehow. I'd create a <tt>config/initializers/dependencies.rb</tt> with something like
+
+  require "lib/api"
+
+Finally, you can set up the API routing. Open <tt>config/routes.rb</tt> and add the following line:
+
+  mount Rack::API => "/"
+
+If you define your API by inheriting from the Rack::API class, remember to mount your class instead.
+
+  mount MyAPI => "/"
+
 For additional examples, see https://github.com/fnando/rack-api/tree/master/examples.
 
 == Maintainer
