@@ -11,7 +11,7 @@ describe Rack::API, "Format" do
     end
   end
 
-  it "ignores unknown formats" do
+  it "ignores unknown paths/formats" do
     get "/users.xml"
     last_response.status.should == 404
   end
@@ -22,6 +22,16 @@ describe Rack::API, "Format" do
 
       last_response.status.should == 406
       last_response.body.should == "Unknown format"
+      last_response.headers["Content-Type"].should == "text/plain"
+    end
+  end
+
+  context "invalid format" do
+    it "renders 406" do
+      get "/v1/users.invalid"
+
+      last_response.status.should == 406
+      last_response.body.should == "Invalid format"
       last_response.headers["Content-Type"].should == "text/plain"
     end
   end

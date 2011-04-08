@@ -7,22 +7,76 @@ module Rack
 
       def initialize
         @settings = {
-          :prefix      => "/",
-          :formats     => %w[json jsonp],
-          :middlewares => []
+          :middlewares => [],
+          :helpers => [],
+          :global => {
+            :prefix      => "/",
+            :formats     => %w[json jsonp],
+            :middlewares => [],
+            :helpers     => []
+          }
         }
+      end
+
+      # Set configuration based on scope. When defining values outside version block,
+      # will set configuration using <tt>settings[:global]</tt> namespace.
+      #
+      # Use the Rack::API::Runner#option method to access a given setting.
+      #
+      def set(name, value, mode = :override)
+        target = settings[:version] ? settings : settings[:global]
+
+        if mode == :override
+          target[name] = value
+        else
+          target[name] << value
+        end
+      end
+
+      # Try to fetch local configuration, defaulting to the global setting.
+      # Return +nil+ when no configuration is defined.
+      #
+      def option(name, mode = :any)
+        if mode == :merge && (settings[name].kind_of?(Array) || settings[:global][name].kind_of?(Array))
+          settings[:global].fetch(name, []) | settings.fetch(name, [])
+        else
+          settings.fetch(name, settings[:global][name])
+        end
       end
 
       # Add a middleware to the execution stack.
       #
+      # Global middlewares will be merged with local middlewares.
+      #
+      #   Rack::API.app do
+      #     use ResponseTime
+      #
+      #     version :v1 do
+      #       use Gzip
+      #     end
+      #   end
+      #
+      # The middleware stack will be something like <tt>[ResponseTime, Gzip]</tt>.
+      #
       def use(middleware, *args)
-        settings[:middlewares] << [middleware, *args]
+        set :middlewares, [middleware, *args], :append
       end
 
       # Set an additional url prefix.
       #
       def prefix(name)
-        settings[:prefix] = name
+        set :prefix, name
+      end
+
+      # Add a helper to application.
+      #
+      #   helper MyHelpers
+      #   helper {  }
+      #
+      def helper(mod = nil, &block)
+        mod = Module.new(&block) if block_given?
+        raise ArgumentError, "you need to pass a module or block" unless mod
+        set :helpers, mod, :append
       end
 
       # Create a new API version.
@@ -48,8 +102,34 @@ module Rack
       #       User.authenticate(user, pass)
       #     end
       #   end
+      #
+      # You can disable basic authentication by providing <tt>:none</tt> as
+      # realm.
+      #
+      #   Rack::API.app do
+      #     basic_auth "Protected Area" do |user, pass|
+      #       User.authenticate(user, pass)
+      #     end
+      #
+      #     version :v1 do
+      #       # this version is protected by the
+      #       # global basic auth block above.
+      #     end
+      #
+      #     version :v2 do
+      #       basic_auth :none
+      #       # this version is now public
+      #     end
+      #
+      #     version :v3 do
+      #       basic_auth "Admin" do |user, pass|
+      #         user == "admin" && pass == "test"
+      #       end
+      #     end
+      #   end
+      #
       def basic_auth(realm = "Restricted Area", &block)
-        settings[:auth] = [realm, block]
+        set :auth, (realm == :none ? :none : [realm, block])
       end
 
       # Define the formats that this app implements.
@@ -65,8 +145,20 @@ module Rack
       # See Rack::API::Formatter::Jsonp for an example on how to create additional
       # formatters.
       #
+      # Local formats will override the global configuration on that context.
+      #
+      #   Rack::API.app do
+      #     respond_to :json, :xml, :jsonp
+      #
+      #     version :v1 do
+      #       respond_to :json
+      #     end
+      #   end
+      #
+      # The code above will accept only <tt>:json</tt> as format on version <tt>:v1</tt>.
+      #
       def respond_to(*formats)
-        settings[:formats] = formats
+        set :formats, formats
       end
 
       # Hold all routes.
@@ -102,15 +194,30 @@ module Rack
         RUBY
       end
 
+      private
       def mount_path(path) # :nodoc:
-        Rack::Mount::Utils.normalize_path([settings[:prefix], settings[:version], path].join("/"))
+        Rack::Mount::Utils.normalize_path([option(:prefix), settings[:version], path].join("/"))
       end
 
       def build_app(block) # :nodoc:
+        app = App.new(:block => block)
         builder = Rack::Builder.new
-        builder.use Rack::Auth::Basic, settings[:auth][0], &settings[:auth][1] if settings[:auth]
-        settings[:middlewares].each {|middleware| builder.use(*middleware)}
-        builder.run App.new(:block => block)
+
+        # Add middleware for basic authentication.
+        auth = option(:auth)
+        builder.use Rack::Auth::Basic, auth[0], &auth[1] if auth && auth != :none
+
+        # Add middleware for format validation.
+        builder.use Rack::API::Middleware::Format, option(:formats)
+
+        # Add middlewares to executation stack.
+        option(:middlewares, :merged).each {|middleware| builder.use(*middleware)}
+
+        # Apply helpers to app.
+        helpers = option(:helpers)
+        app.extend *helpers unless helpers.empty?
+
+        builder.run(app)
         builder.to_app
       end
     end

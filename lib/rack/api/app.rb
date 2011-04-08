@@ -117,6 +117,15 @@ module Rack
         @headers = nil
       end
 
+      # Return credentials for Basic Authentication request.
+      #
+      def credentials
+        @credentials ||= begin
+          request = Rack::Auth::Basic::Request.new(env)
+          request.provided? ? request.credentials : []
+        end
+      end
+
       # Render the result of block.
       #
       def call(env) # :nodoc:

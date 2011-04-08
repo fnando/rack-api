@@ -9,6 +9,7 @@ module Rack
   class API
     autoload :App, "rack/api/app"
     autoload :Formatter, "rack/api/formatter"
+    autoload :Middleware, "rack/api/middleware"
     autoload :Runner, "rack/api/runner"
     autoload :Response, "rack/api/response"
     autoload :Version, "rack/api/version"
