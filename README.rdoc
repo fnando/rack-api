@@ -56,6 +56,74 @@ If you define your API by inheriting from the Rack::API class, remember to mount
 
 For additional examples, see https://github.com/fnando/rack-api/tree/master/examples.
 
+=== Using RSpec with Rack::API
+
+You can easily test Rack::API apps by using Rack::Test. This applies to both RSpec and Test Unit. See what you need to do if you want to use it with RSpec.
+
+First, open your <tt>spec/spec_helper.rb</tt> and add something like this:
+
+  require "rspec"
+  require "rack/test"
+
+  RSpec.configure do |config|
+    config.include Rack::Test::Methods
+  end
+
+Then you can go to your spec file, say, <tt>spec/api_spec.rb</tt>. You need to define a helper method called +app+, which will point to your Rack::API (the class itself or your own class).
+
+  require "spec_helper"
+
+  describe Rack::API do
+    # Remember to use your own class if you
+    # inherited from Rack::API
+    def app; Rack::API; end
+
+    it "renders status page" do
+      get "/api/v1/status"
+      JSON.load(last_response.body).should == {:status => "running"}
+      last_response.status.should == 200
+    end
+  end
+
+If you want to do expectations over basic authentication, you'll have some like this:
+
+  require "spec_helper"
+
+  describe Rack::API do
+    def basic_auth(username, password)
+      "Basic " + Base64.encode64("#{username}:#{password}")
+    end
+
+    it "requires authentication" do
+      get "/api/v1/status"
+      last_response.status.should == 401
+    end
+
+    it "grants access" do
+      get "/api/v1/status", {"HTTP_AUTHORIZATION" => basic_auth("john", "test")}
+      last_response.status.should == 200
+    end
+  end
+
+To reduce duplication, you can move both <tt>basic_auth</tt> and <tt>app</tt> methods to a module, which will be included on RSpec.
+
+  RSpec.configure do |config|
+    config.include Rack::Test::Methods
+    config.include Helpers
+  end
+
+Your <tt>Helpers</tt> module may look like this:
+
+  module Helpers
+    def app
+      Rack::API
+    end
+
+    def basic_auth(username, password)
+      "Basic " + Base64.encode64("#{username}:#{password}")
+    end
+  end
+
 == Maintainer
 
 * Nando Vieira (http://nandovieira.com.br)
