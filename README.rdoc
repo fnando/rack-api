@@ -80,7 +80,7 @@ Then you can go to your spec file, say, <tt>spec/api_spec.rb</tt>. You need to d
 
     it "renders status page" do
       get "/api/v1/status"
-      JSON.load(last_response.body).should == {:status => "running"}
+      last_response.body.should == {:status => "running"}.to_json
       last_response.status.should == 200
     end
   end

@@ -17,7 +17,7 @@ describe Rack::API, "HTTP Methods" do
     it "renders #{method}" do
       send method, "/v1/#{method}"
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {method => true}
+      last_response.body.should == {method => true}.to_json
     end
   end
 

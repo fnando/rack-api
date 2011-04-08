@@ -7,6 +7,6 @@ describe Rack::API do
 
   it "renders action from MyApp" do
     get "/v1"
-    JSON.load(last_response.body).should == {"myapp" => true}
+    last_response.body.should == {"myapp" => true}.to_json
   end
 end

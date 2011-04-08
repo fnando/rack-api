@@ -23,11 +23,11 @@ describe Rack::API, "Helpers" do
 
   it "adds module helper" do
     get "/v1"
-    JSON.load(last_response.body).should include("module")
+    json(last_response.body).should include("module")
   end
 
   it "adds block helper" do
     get "/v1"
-    JSON.load(last_response.body).should include("block")
+    json(last_response.body).should include("block")
   end
 end

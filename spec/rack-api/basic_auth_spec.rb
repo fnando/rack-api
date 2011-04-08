@@ -43,7 +43,7 @@ describe Rack::API, "Basic Authentication" do
       get "/v1/", {}, "HTTP_AUTHORIZATION" => basic_auth("admin", "test")
 
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {"success" => true}
+      last_response.body.should == {"success" => true}.to_json
     end
   end
 
@@ -52,7 +52,7 @@ describe Rack::API, "Basic Authentication" do
       get "/v2/"
 
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {"success" => true}
+      last_response.body.should == {"success" => true}.to_json
     end
   end
 
@@ -69,17 +69,17 @@ describe Rack::API, "Basic Authentication" do
       get "/v3/", {}, "HTTP_AUTHORIZATION" => basic_auth("john", "test")
 
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {"success" => true}
+      last_response.body.should == {"success" => true}.to_json
     end
   end
 
   it "returns credentials" do
     get "/v2/credentials", {}, "HTTP_AUTHORIZATION" => basic_auth("admin", "test")
-    JSON.load(last_response.body).should == ["admin", "test"]
+    last_response.body.should == ["admin", "test"].to_json
   end
 
   it "returns empty array when no credentials are provided" do
     get "/v2/credentials"
-    JSON.load(last_response.body).should == []
+    last_response.body.should == [].to_json
   end
 end

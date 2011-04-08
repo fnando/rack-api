@@ -211,7 +211,7 @@ module Rack
         builder.use Rack::API::Middleware::Format, option(:formats)
 
         # Add middlewares to executation stack.
-        option(:middlewares, :merged).each {|middleware| builder.use(*middleware)}
+        option(:middlewares, :merge).each {|middleware| builder.use(*middleware)}
 
         # Apply helpers to app.
         helpers = option(:helpers)

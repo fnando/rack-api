@@ -62,14 +62,14 @@ describe Rack::API, "Format" do
       get "/v1", :format => "json"
 
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {"success" => true}
+      last_response.body.should == {"success" => true}.to_json
     end
 
     it "renders when set through extension" do
       get "/v1/users.json"
 
       last_response.status.should == 200
-      JSON.load(last_response.body).should == {"users" => []}
+      last_response.body.should == {"users" => []}.to_json
     end
 
     it "sends header" do
