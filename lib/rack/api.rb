@@ -3,6 +3,7 @@ require "rack/mount"
 require "active_support/hash_with_indifferent_access"
 require "json"
 require "logger"
+require "forwardable"
 
 module Rack
   class API
@@ -11,6 +12,12 @@ module Rack
     autoload :Runner, "rack/api/runner"
     autoload :Response, "rack/api/response"
     autoload :Version, "rack/api/version"
+
+    class << self
+      extend Forwardable
+
+      def_delegators :runner, :version, :use, :prefix, :basic_auth, :helper, :respond_to
+    end
 
     # A shortcut for defining new APIs. Instead of creating a
     # class that inherits from Rack::API, you can simply pass a
@@ -23,41 +30,6 @@ module Rack
     def self.app(&block)
       runner.instance_eval(&block)
       runner
-    end
-
-    # Add a middleware to the stack execution.
-    #
-    #   Rack::API.app do
-    #     use MyMiddleware
-    #   end
-    #
-    def self.use(m)
-      runner.use(m)
-    end
-
-    # Create a new API version.
-    #
-    #   Rack::API.app do
-    #     version "v1" do
-    #       # define your API
-    #     end
-    #   end
-    #
-    def self.version(name, &block)
-      runner.version(name, &block)
-    end
-
-    # Set an additional url prefix.
-    #
-    #   Rack::API.app do
-    #     prefix "api"
-    #     version("v1") {}
-    #   end
-    #
-    # This API will be available through <tt>/api/v1</tt> path.
-    #
-    def self.prefix(name)
-      runner.prefix(name)
     end
 
     # Reset all API definitions while using the Rack::API.app method.
