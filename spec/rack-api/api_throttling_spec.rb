@@ -2,7 +2,13 @@ require "spec_helper"
 
 describe Rack::API::Middleware::Limit do
   let(:action) { proc {|env| [200, {}, ["success"]] } }
-  let(:env) { Rack::MockRequest.env_for("/v1", "REMOTE_ADDR" => "127.0.0.1", "X-API_KEY" => "fo7hy7ra") }
+  let(:env) {
+    Rack::MockRequest.env_for("/v1",
+      "REMOTE_ADDR"        => "127.0.0.1",
+      "X-API_KEY"          => "fo7hy7ra",
+      "HTTP_AUTHORIZATION" => basic_auth("admin", "test")
+    )
+  }
 
   subject { Rack::API::Middleware::Limit.new(action) }
 
@@ -12,8 +18,9 @@ describe Rack::API::Middleware::Limit do
 
     begin
       $redis = Redis.new
-      $redis.set "api:127.0.0.1:#{@stamp}", "0"
-      $redis.set "api:fo7hy7ra:#{@stamp}", "0"
+      $redis.del "api:127.0.0.1:#{@stamp}"
+      $redis.del "api:fo7hy7ra:#{@stamp}"
+      $redis.del "api:admin:#{@stamp}"
       $redis.del "api:whitelist"
       subject.options.merge!(:with => $redis)
     rescue Exception => e
@@ -56,10 +63,14 @@ describe Rack::API::Middleware::Limit do
     end
 
     it "uses custom block key" do
-      subject.options.merge!(:key => proc {|env| env["X-API_KEY"]})
+      subject.options.merge! :key => proc {|env|
+        request = Rack::Auth::Basic::Request.new(env)
+        request.credentials[0]
+      }
+
       status, headers, result = subject.call(env)
 
-      $redis.get("api:fo7hy7ra:#{@stamp}").to_i.should == 1
+      $redis.get("api:admin:#{@stamp}").to_i.should == 1
       status.should == 200
     end
   end

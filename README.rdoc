@@ -124,6 +124,49 @@ Your <tt>Helpers</tt> module may look like this:
     end
   end
 
+== Useful middlewares
+
+=== Rack::API::Middleware::SSL
+
+This middleware will accept only HTTPS requests. Any request on HTTP will be dropped.
+
+  Rack::API.app do
+    use Rack::API::Middleware::SSL
+  end
+
+=== Rack::API::Middleware::Limit
+
+This middleware will limit access to API based on requests per hour. It requires a Redis connection.
+
+  Rack::API.app do
+    # Use the default settings.
+    # Will accept 60 requests/hour limited by IP address (REMOTE_ADDR)
+    use Rack::API::Middleware::Limit, :with => Redis.new
+  end
+
+Other usages:
+
+  # Set custom limit/hour.
+  # Will accept ± 1 request/second.
+  use Rack::API::Middleware::Limit, :with => $redis, :limit => 3600
+
+  # Set custom string key.
+  # Will limit by something like env["X-Forwarded-For"].
+  use Rack::API::Middleware::Limit, :with => $redis, :key => "X-Forwarded-For"
+
+  # Set custom block key.
+  # Will limit by credential (Basic Auth).
+  Rack::API.app do
+    basic_auth do |user, pass|
+      User.authorize(user, pass)
+    end
+
+    use Rack::API::Middleware::Limit, :with => $redis, :key => proc {|env|
+      request = Rack::Auth::Basic::Request.new(env)
+      request.credentials[0]
+    }
+  end
+
 == Maintainer
 
 * Nando Vieira (http://nandovieira.com.br)
