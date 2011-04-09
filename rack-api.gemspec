@@ -22,5 +22,6 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport", "~> 3.0.6"
   s.add_development_dependency "rspec", "~> 2.5.0"
   s.add_development_dependency "rack-test", "~> 0.5.7"
+  s.add_development_dependency "redis", "~> 2.2.0"
   s.add_development_dependency "ruby-debug19" if RUBY_VERSION >= "1.9"
 end
