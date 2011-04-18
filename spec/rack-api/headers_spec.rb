@@ -6,7 +6,7 @@ describe Rack::API, "Headers" do
       version :v1 do
         get("/users(.:format)") do
           headers["X-Awesome"] = "U R Awesome"
-          headers["Content-Type"] = "application/x-json"
+          headers["Content-Type"] = "application/x-json" # the default json header is application/json
         end
       end
     end

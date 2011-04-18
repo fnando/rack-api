@@ -157,6 +157,13 @@ module Rack
       #
       # The code above will accept only <tt>:json</tt> as format on version <tt>:v1</tt>.
       #
+      # Also, the first value provided to this method will be used as default format,
+      # which means that requests that don't provide the <tt>:format</tt> param, will use
+      # this value.
+      #
+      #   respond_to :fffuuu, :json
+      #   #=> the default format is fffuuu
+      #
       def respond_to(*formats)
         set :formats, formats
       end
@@ -199,8 +206,12 @@ module Rack
         Rack::Mount::Utils.normalize_path([option(:prefix), settings[:version], path].join("/"))
       end
 
+      def default_format # :nodoc:
+        (option(:formats).first || "json").to_s
+      end
+
       def build_app(block) # :nodoc:
-        app = App.new(:block => block)
+        app = App.new(:block => block, :default_format => default_format)
         builder = Rack::Builder.new
 
         # Add middleware for basic authentication.
@@ -208,7 +219,7 @@ module Rack
         builder.use Rack::Auth::Basic, auth[0], &auth[1] if auth && auth != :none
 
         # Add middleware for format validation.
-        builder.use Rack::API::Middleware::Format, option(:formats)
+        builder.use Rack::API::Middleware::Format, default_format, option(:formats)
 
         # Add middlewares to executation stack.
         option(:middlewares, :merge).each {|middleware| builder.use(*middleware)}

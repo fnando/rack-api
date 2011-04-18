@@ -26,6 +26,33 @@ describe Rack::API, "Format" do
     end
   end
 
+  context "default format" do
+    it "is json" do
+      Rack::API.app do
+        version :v2 do
+          get("/") { {:success => true} }
+        end
+      end
+
+      get "/v2"
+      last_response.headers["Content-Type"].should == "application/json"
+    end
+
+    it "is set to the first respond_to value" do
+      Rack::API::App::MIME_TYPES["fffuuu"] = "application/x-fffuuu"
+
+      Rack::API.app do
+        version :v2 do
+          respond_to :fffuuu, :json
+          get("/") { OpenStruct.new(:to_fffuuu => "Fffuuu") }
+        end
+      end
+
+      get "/v2"
+      last_response.headers["Content-Type"].should == "application/x-fffuuu"
+    end
+  end
+
   context "invalid format" do
     it "renders 406" do
       get "/v1/users.invalid"

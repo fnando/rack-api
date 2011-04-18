@@ -25,6 +25,7 @@ module Rack
 
       attr_reader :block
       attr_reader :env
+      attr_reader :default_format
 
       # Hold block that will be executed in case the
       # route is recognized.
@@ -62,7 +63,7 @@ module Rack
       # Return the requested format. Defaults to JSON.
       #
       def format
-        params.fetch(:format, "json")
+        params.fetch(:format, default_format)
       end
 
       # Stop processing by rendering the provided information.
