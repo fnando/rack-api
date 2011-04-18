@@ -58,7 +58,7 @@ describe Rack::API, "Format" do
       get "/v1/users.invalid"
 
       last_response.status.should == 406
-      last_response.body.should == "Invalid format"
+      last_response.body.should == "Invalid format. Accepts one of [json, jsonp, awesome, fffuuu, zomg]"
       last_response.headers["Content-Type"].should == "text/plain"
     end
   end

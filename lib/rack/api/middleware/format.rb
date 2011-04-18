@@ -16,7 +16,7 @@ module Rack
           if @formats.include?(requested_format)
             @app.call(env)
           else
-            [406, {"Content-Type" => "text/plain"}, ["Invalid format"]]
+            [406, {"Content-Type" => "text/plain"}, ["Invalid format. Accepts one of [#{@formats.join(", ")}]"]]
           end
         end
       end
