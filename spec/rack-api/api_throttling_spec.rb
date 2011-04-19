@@ -23,7 +23,7 @@ describe Rack::API::Middleware::Limit do
       $redis.del "api:admin:#{@stamp}"
       $redis.del "api:whitelist"
       subject.options.merge!(:with => $redis)
-    # rescue Exception => e
+    rescue Errno::ECONNREFUSED => e
       pending "Redis is not running"
     end
   end
