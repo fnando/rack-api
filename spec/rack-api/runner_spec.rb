@@ -19,6 +19,11 @@ describe Rack::API::Runner do
     subject.option(:prefix).should == "my/awesome/api"
   end
 
+  it "stores default url options" do
+    subject.default_url_options(:host => "example.com")
+    subject.option(:url_options).should == {:host => "example.com"}
+  end
+
   it "stores middleware" do
     subject.use Rack::Auth::Basic
     subject.option(:middlewares, :merge).should == [[Rack::Auth::Basic]]

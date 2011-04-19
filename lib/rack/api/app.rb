@@ -23,14 +23,19 @@ module Rack
       #
       DEFAULT_MIME_TYPE = "application/octet-stream"
 
-      attr_reader :block
-      attr_reader :env
-      attr_reader :default_format
+      attr_accessor :block
+      attr_accessor :env
+      attr_accessor :default_format
+      attr_accessor :prefix
+      attr_accessor :version
+      attr_accessor :url_options
 
       # Hold block that will be executed in case the
       # route is recognized.
       #
       def initialize(options)
+        @url_options = {}
+
         options.each do |name, value|
           instance_variable_set("@#{name}", value)
         end
@@ -148,6 +153,48 @@ module Rack
       def content_type
         mime = MIME_TYPES.fetch(format, DEFAULT_MIME_TYPE)
         headers.fetch("Content-Type", mime)
+      end
+
+      # Return a URL path for all segments.
+      # You can set default options by using the
+      # Rack::API::Runner#default_url_options method.
+      #
+      #   url_for :users
+      #   #=> /users
+      #
+      #   url_for :users, User.first
+      #   #=> /users/1
+      #
+      #   url_for :users, 1, :format => :json
+      #   #=> /users/1?format=json
+      #
+      #   url_for :users, :filters => [:name, :age]
+      #   #=> /users?filters[]=name&filters[]=age
+      #
+      # URL segments can be any kind of object, first checking it responds to the
+      # <tt>to_param</tt> method. If not, converts object to string by using the
+      # <tt>to_s</tt> method.
+      #
+      def url_for(*args)
+        options = {}
+        options = args.pop if args.last.kind_of?(Hash)
+
+        segments = []
+        segments << url_options[:base_path] if url_options[:base_path]
+        segments << prefix if prefix
+        segments << version
+        segments += args.collect {|part| part.respond_to?(:to_param) ? part.to_param : part.to_s }
+
+        url = ""
+        url << url_options.fetch(:protocol, "http").to_s << "://"
+        url << url_options.fetch(:host, env["SERVER_NAME"])
+
+        port = url_options.fetch(:port, env["SERVER_PORT"]).to_i
+        url << ":" << port.to_s if port.nonzero? && port != 80
+
+        url << Rack::Mount::Utils.normalize_path(segments.join("/"))
+        url << "?" << options.to_param if options.any?
+        url
       end
 
       private

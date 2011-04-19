@@ -1,18 +1,19 @@
 require "rack"
 require "rack/mount"
 require "active_support/hash_with_indifferent_access"
+require "active_support/core_ext/object/to_query"
 require "json"
 require "logger"
 require "forwardable"
 
 module Rack
   class API
-    autoload :App, "rack/api/app"
-    autoload :Formatter, "rack/api/formatter"
-    autoload :Middleware, "rack/api/middleware"
-    autoload :Runner, "rack/api/runner"
-    autoload :Response, "rack/api/response"
-    autoload :Version, "rack/api/version"
+    autoload :App         , "rack/api/app"
+    autoload :Formatter   , "rack/api/formatter"
+    autoload :Middleware  , "rack/api/middleware"
+    autoload :Runner      , "rack/api/runner"
+    autoload :Response    , "rack/api/response"
+    autoload :Version     , "rack/api/version"
 
     class << self
       extend Forwardable

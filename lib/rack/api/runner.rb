@@ -79,6 +79,32 @@ module Rack
         set :helpers, mod, :append
       end
 
+      # Define the server endpoint. Will be used if you call the method
+      # Rack::API::App#url_for.
+      #
+      # The following options are supported:
+      #
+      # * <tt>:host</tt> – Specifies the host the link should be targeted at.
+      # * <tt>:protocol</tt> – The protocol to connect to. Defaults to 'http'.
+      # * <tt>:port</tt> – Optionally specify the port to connect to.
+      # * <tt>:base_path</tt> – Optionally specify a base path.
+      #
+      #   default_url_options :host => "myhost.com"
+      #   #=> http://myhost.com
+      #
+      #   default_url_options :host => "myhost.com", :protocol => "https"
+      #   #=> https://myhost.com
+      #
+      #   default_url_options :host => "myhost.com", :port => 3000
+      #   #=> http://myhost.com:3000
+      #
+      #   default_url_options :host => "myhost.com", :base_path => "my/custom/path"
+      #   #=> http://myhost.com/my/custom/path
+      #
+      def default_url_options(options = {})
+        set :url_options, options
+      end
+
       # Create a new API version.
       #
       def version(name, &block)
@@ -211,7 +237,14 @@ module Rack
       end
 
       def build_app(block) # :nodoc:
-        app = App.new(:block => block, :default_format => default_format)
+        app = App.new({
+          :block          => block,
+          :default_format => default_format,
+          :version        => option(:version),
+          :prefix         => option(:prefix),
+          :url_options    => option(:url_options)
+        })
+
         builder = Rack::Builder.new
 
         # Add middleware for basic authentication.
