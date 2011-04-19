@@ -98,9 +98,9 @@ module Rack
       #
       # Valid options are:
       #
-      # # <tt>:status</tt>: a HTTP status code. Defaults to 403.
-      # # <tt>:message</tt>: a message that will be rendered as the response body. Defaults to "Forbidden".
-      # # <tt>:headers</tt>: the response headers. Defaults to <tt>{"Content-Type" => "text/plain"}</tt>.
+      # * <tt>:status</tt>: a HTTP status code. Defaults to 403.
+      # * <tt>:message</tt>: a message that will be rendered as the response body. Defaults to "Forbidden".
+      # * <tt>:headers</tt>: the response headers. Defaults to <tt>{"Content-Type" => "text/plain"}</tt>.
       #
       # You can also provide a object that responds to <tt>to_rack</tt>. In this case, this
       # method must return a valid Rack response (a 3-item array).
@@ -186,8 +186,8 @@ module Rack
       #   url_for :users, :filters => [:name, :age]
       #   #=> /users?filters[]=name&filters[]=age
       #
-      # URL segments can be any kind of object, first checking it responds to the
-      # <tt>to_param</tt> method. If not, converts object to string by using the
+      # URL segments can be any kind of object. First it'll be checked if it responds to
+      # the <tt>to_param</tt> method. If not, converts object to string by using the
       # <tt>to_s</tt> method.
       #
       def url_for(*args)

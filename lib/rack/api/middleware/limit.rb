@@ -26,24 +26,24 @@ module Rack
         end
 
         private
-        def authorized?
+        def authorized? # :nodoc:
           count = redis.incr(key)
           redis.expire(key, 3600)
 
           count <= options[:limit] || redis.sismember("api:whitelist", identifier)
         end
 
-        def redis
+        def redis # :nodoc:
           options[:with]
         end
 
-        def identifier
+        def identifier # :nodoc:
           @identifier ||= begin
             options[:key].respond_to?(:call) ? options[:key].call(env).to_s : env[options[:key].to_s]
           end
         end
 
-        def key
+        def key # :nodoc:
           @key ||= begin
             "api:#{identifier}:#{Time.now.strftime("%Y%m%d%H")}"
           end

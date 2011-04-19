@@ -50,7 +50,7 @@ module Rack
     # Initialize a new Rack::API::Middleware instance, so
     # we can use it on other class methods.
     #
-    def self.runner
+    def self.runner # :nodoc:
       @runner ||= Runner.new
     end
   end

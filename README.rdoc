@@ -187,7 +187,7 @@ Build an URL by merging segments, default URL options and hash with parameters.
 
 === Rack::API::Middleware::SSL
 
-This middleware will accept only HTTPS requests. Any request on HTTP will be dropped.
+This middleware will accept only HTTPS requests. Any request over HTTP will be dropped.
 
   Rack::API.app do
     use Rack::API::Middleware::SSL

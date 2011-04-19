@@ -94,6 +94,8 @@ module Rack
       # * <tt>:port</tt> – Optionally specify the port to connect to.
       # * <tt>:base_path</tt> – Optionally specify a base path.
       #
+      # Some usage examples:
+      #
       #   default_url_options :host => "myhost.com"
       #   #=> http://myhost.com
       #
