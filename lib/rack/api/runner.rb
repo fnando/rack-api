@@ -3,6 +3,11 @@ module Rack
     class Runner
       HTTP_METHODS = %w[get post put delete head]
 
+      DELEGATE_METHODS = %w[
+        version use prefix basic_auth
+        helper respond_to default_url_options
+      ]
+
       attr_accessor :settings
 
       def initialize

@@ -18,7 +18,7 @@ module Rack
     class << self
       extend Forwardable
 
-      def_delegators :runner, :version, :use, :prefix, :basic_auth, :helper, :respond_to
+      def_delegators :runner, *Runner::DELEGATE_METHODS
     end
 
     # A shortcut for defining new APIs. Instead of creating a
