@@ -124,6 +124,65 @@ Your <tt>Helpers</tt> module may look like this:
     end
   end
 
+== Helpers
+
+Every Rack::API action has several helper methods available through the
+Rack::API::App class. Here's some of them:
+
+=== logger
+
+Logs specified message to the STDOUT.
+
+  get "/" do
+    logger.info "Hello index page!"
+    {}
+  end
+
+=== headers
+
+Define custom headers that will be sent to the client.
+
+  get "/" do
+    headers["X-Awesome"] = "U R Awesome"
+    {}
+  end
+
+== params
+
+Return current request parameters.
+
+  get "/" do
+    {:message => "Hello #{params[:name]}"}
+  end
+
+== request
+
+Return an object relative to the current request.
+
+== credentials
+
+This method will return an array container both username and password if client
+sent Basic Authentication headers.
+
+  get "/" do
+    user, pass = credentials
+    {:message => "Hello #{user}"}
+  end
+
+== url_for
+
+Build an URL by merging segments, default URL options and hash with parameters.
+
+  Rack::API.app do
+    default_url_options :host => "example.com", :protocol => "https"
+
+    version "v1" do
+      get "/" do
+        {:url => url_for(:users, User.find(params[:id])), :format => :json}
+      end
+    end
+  end
+
 == Useful middlewares
 
 === Rack::API::Middleware::SSL
