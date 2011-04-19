@@ -49,11 +49,11 @@ module Rack
       attr_accessor :url_options
 
       def initialize(options)
-        @url_options = {}
-
         options.each do |name, value|
           instance_variable_set("@#{name}", value)
         end
+
+        @url_options ||= {}
       end
 
       # Always log to the standard output.

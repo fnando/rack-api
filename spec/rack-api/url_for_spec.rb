@@ -21,6 +21,14 @@ describe Rack::API::App, "#url_for" do
     subject.url_for.should == "http://example.org/v1"
   end
 
+  it "sets default url options hash" do
+    subject = Rack::API::App.new(:version => "v1", :url_options => nil, :env => Rack::MockRequest.env_for("/v1"))
+
+    expect {
+      subject.url_for(:things, 1)
+    }.to_not raise_error
+  end
+
   it "uses a different host" do
     subject.url_options.merge!(:host => "mysite.com")
     subject.url_for.should == "http://mysite.com/v1"
