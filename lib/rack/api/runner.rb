@@ -101,7 +101,7 @@ module Rack
       #   default_url_options :host => "myhost.com", :base_path => "my/custom/path"
       #   #=> http://myhost.com/my/custom/path
       #
-      def default_url_options(options = {})
+      def default_url_options(options)
         set :url_options, options
       end
 
@@ -236,9 +236,9 @@ module Rack
         (option(:formats).first || "json").to_s
       end
 
-      def build_app(block) # :nodoc:
+      def build_app(handler) # :nodoc:
         app = App.new({
-          :block          => block,
+          :handler        => handler,
           :default_format => default_format,
           :version        => option(:version),
           :prefix         => option(:prefix),

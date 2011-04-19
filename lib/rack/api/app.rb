@@ -23,16 +23,31 @@ module Rack
       #
       DEFAULT_MIME_TYPE = "application/octet-stream"
 
-      attr_accessor :block
-      attr_accessor :env
-      attr_accessor :default_format
-      attr_accessor :prefix
-      attr_accessor :version
-      attr_accessor :url_options
-
       # Hold block that will be executed in case the
       # route is recognized.
       #
+      attr_accessor :handler
+
+      # Hold environment from current request.
+      #
+      attr_accessor :env
+
+      # Define which will be the default format when <tt>format=<format></tt>
+      # is not defined.
+      attr_accessor :default_format
+
+      # Set the default prefix path.
+      #
+      attr_accessor :prefix
+
+      # Specify the API version.
+      #
+      attr_accessor :version
+
+      # Hold url options.
+      #
+      attr_accessor :url_options
+
       def initialize(options)
         @url_options = {}
 
@@ -132,14 +147,14 @@ module Rack
         end
       end
 
-      # Render the result of block.
+      # Render the result of handler.
       #
       def call(env) # :nodoc:
         reset!
         @env = env
 
         response = catch(:error) do
-          render instance_eval(&block)
+          render instance_eval(&handler)
         end
 
         response.respond_to?(:to_rack) ? response.to_rack : response

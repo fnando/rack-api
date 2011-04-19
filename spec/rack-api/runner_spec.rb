@@ -35,4 +35,23 @@ describe Rack::API::Runner do
     subject.basic_auth("Get out!", &handler)
     subject.settings[:global][:auth].should == ["Get out!", handler]
   end
+
+  it "initializes application with correct parameters" do
+    expected = {
+      :version => "v1",
+      :url_options => {:host => "mysite.com"},
+      :default_format => "fffuuu",
+      :prefix => "api",
+      :handler => proc {}
+    }
+
+    Rack::API::App.should_receive(:new).with(hash_including(expected)).once
+    subject.version("v1") do
+      respond_to :fffuuu
+      prefix "api"
+      default_url_options :host => "mysite.com"
+
+      get("/", &expected[:handler])
+    end
+  end
 end
