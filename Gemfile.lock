@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     rack-api (0.2.0)
-      activesupport (~> 3.0.7)
-      rack (~> 1.2.1)
-      rack-mount (~> 0.6.14)
+      activesupport (>= 3.0.0)
+      rack (>= 1.0.0)
+      rack-mount (>= 0.6.0)
 
 GEM
   remote: http://rubygems.org/
