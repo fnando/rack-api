@@ -265,7 +265,7 @@ module Rack
         option(:middlewares, :merge).each {|middleware| builder.use(*middleware)}
 
         # Apply helpers to app.
-        helpers = option(:helpers)
+        helpers = option(:helpers, :merge)
         app.extend *helpers unless helpers.empty?
 
         builder.run(app)

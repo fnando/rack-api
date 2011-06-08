@@ -16,7 +16,9 @@ describe Rack::API, "Helpers" do
           end
         end
 
-        get("/") { [helper_from_block, helper_from_module] }
+        get("/") do
+          [helper_from_block, helper_from_module]
+        end
       end
     end
   end
