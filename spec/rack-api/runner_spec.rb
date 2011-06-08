@@ -3,7 +3,7 @@ require "spec_helper"
 describe Rack::API::Runner do
   specify "sanity check for delegate methods" do
     # remember to update spec/method_delegation_spec.rb
-    Rack::API::Runner::DELEGATE_METHODS.size.should == 7
+    Rack::API::Runner::DELEGATE_METHODS.size.should == 8
   end
 
   it "responds to http methods" do

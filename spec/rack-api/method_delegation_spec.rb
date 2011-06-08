@@ -9,4 +9,5 @@ describe Rack::API, "delegators" do
   it { should respond_to(:basic_auth) }
   it { should respond_to(:helper) }
   it { should respond_to(:default_url_options) }
+  it { should respond_to(:rescue_from) }
 end

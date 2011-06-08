@@ -4,7 +4,7 @@ module Rack
       HTTP_METHODS = %w[get post put delete head]
 
       DELEGATE_METHODS = %w[
-        version use prefix basic_auth
+        version use prefix basic_auth rescue_from
         helper respond_to default_url_options
       ]
 
@@ -14,11 +14,13 @@ module Rack
         @settings = {
           :middlewares => [],
           :helpers => [],
+          :rescuers => [],
           :global => {
-            :prefix      => "/",
-            :formats     => %w[json jsonp],
+            :prefix => "/",
+            :formats => %w[json jsonp],
             :middlewares => [],
-            :helpers     => []
+            :helpers => [],
+            :rescuers => []
           }
         }
       end
@@ -234,6 +236,19 @@ module Rack
         RUBY
       end
 
+      # Rescue from the specified exception.
+      #
+      #   rescue_from ActiveRecord::RecordNotFound, :status => 404
+      #   rescue_from Exception, :status => 500
+      #   rescue_from Exception do
+      #     $logger.error error.inspect
+      #     [500, {"Content-Type" => "text/plain"}, []]
+      #   end
+      #
+      def rescue_from(exception, options = {}, &block)
+        set :rescuers, {:class_name => exception.name, :options => options, :block => block}, :append
+      end
+
       private
       def mount_path(path) # :nodoc:
         Rack::Mount::Utils.normalize_path([option(:prefix), settings[:version], path].join("/"))
@@ -249,7 +264,8 @@ module Rack
           :default_format => default_format,
           :version        => option(:version),
           :prefix         => option(:prefix),
-          :url_options    => option(:url_options)
+          :url_options    => option(:url_options),
+          :rescuers       => option(:rescuers, :merge).reverse
         })
 
         builder = Rack::Builder.new

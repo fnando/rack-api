@@ -48,6 +48,11 @@ module Rack
       #
       attr_accessor :url_options
 
+      # Hold handlers, that will wrap exceptions
+      # into a normalized response.
+      #
+      attr_accessor :rescuers
+
       def initialize(options)
         options.each do |name, value|
           instance_variable_set("@#{name}", value)
@@ -158,6 +163,8 @@ module Rack
         end
 
         response.respond_to?(:to_rack) ? response.to_rack : response
+      rescue Exception => exception
+        handle_exception exception
       end
 
       # Return response content type based on extension.
@@ -227,6 +234,21 @@ module Rack
           response.__send__("to_#{format}")
         else
           throw :error, Response.new(:status => 406, :message => "Unknown format")
+        end
+      end
+
+      def handle_exception(error) # :nodoc:
+        rescuer = rescuers.find do |r|
+          error_class = eval("::#{r[:class_name]}") rescue nil
+          error_class && error.kind_of?(error_class)
+        end
+
+        raise error unless rescuer
+
+        if rescuer[:block]
+          instance_exec(error, &rescuer[:block])
+        else
+          [rescuer[:options].fetch(:status, 500), {"Content-Type" => "text/plain"}, []]
         end
       end
     end
