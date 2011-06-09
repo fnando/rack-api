@@ -50,27 +50,8 @@ describe Rack::API, "Rescue from exceptions" do
     last_response.status.should == 501
   end
 
-  it "rescues from exception by using inner handler" do
-    Rack::API.app do
-      rescue_from Exception
-
-      version :v1 do
-        rescue_from Exception do
-          [500, {"Content-Type" => "text/plain"}, ["inner handler"]]
-        end
-
-        get("/500") { raise "Oops!" }
-      end
-    end
-
-    get "/v1/500"
-    last_response.body.should == "inner handler"
-  end
-
   it "rescues from exception in app's context" do
     Rack::API.app do
-      rescue_from Exception
-
       version :v1 do
         rescue_from Exception do
           [500, {"Content-Type" => "text/plain"}, [self.class.name]]
@@ -86,8 +67,6 @@ describe Rack::API, "Rescue from exceptions" do
 
   it "yields the exception object" do
     Rack::API.app do
-      rescue_from Exception
-
       version :v1 do
         rescue_from Exception do |error|
           [500, {"Content-Type" => "text/plain"}, [error.message]]

@@ -265,7 +265,7 @@ module Rack
           :version        => option(:version),
           :prefix         => option(:prefix),
           :url_options    => option(:url_options),
-          :rescuers       => option(:rescuers, :merge).reverse
+          :rescuers       => option(:rescuers, :merge)
         })
 
         builder = Rack::Builder.new
