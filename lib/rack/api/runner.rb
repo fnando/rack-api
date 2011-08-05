@@ -223,9 +223,42 @@ module Rack
       #     end
       #   end
       #
+      # You don't have to use +version+ or +prefix+.
+      #
+      #   class MyAPI < Rack::API
+      #     get "users(.:format)" do
+      #       # do something
+      #     end
+      #   end
+      #
+      # Alternatively, you can define your routes pretty much like Rails.
+      #
+      #   class MyAPI < Rack::API
+      #     get "users(.:format)", :to => "users#index"
+      #   end
+      #
+      # The route above will require a class +Users+ with an instance method +index+.
+      #
+      #   class Users < Rack::API::Controller
+      #     def index
+      #       # do something
+      #     end
+      #   end
+      #
+      # Note that your controller <b>must</b> inherit from Rack::API::Controller. Otherwise,
+      # your world will explode.
+      #
       def route(method, path, requirements = {}, &block)
         path = Rack::Mount::Strexp.compile mount_path(path), requirements, %w[ / . ? ]
-        route_set.add_route(build_app(block), :path_info => path, :request_method => method)
+        controller_class = Controller
+
+        if requirements[:to]
+          controller_name, action_name = requirements.delete(:to).split("#")
+          controller_class = controller_name.camelize.constantize
+          block = proc { __send__(action_name) }
+        end
+
+        route_set.add_route(build_app(controller_class, block), :path_info => path, :request_method => method)
       end
 
       HTTP_METHODS.each do |method|
@@ -258,8 +291,8 @@ module Rack
         (option(:formats).first || "json").to_s
       end
 
-      def build_app(handler) # :nodoc:
-        app = Controller.new({
+      def build_app(controller, handler) # :nodoc:
+        app = controller.new({
           :handler        => handler,
           :default_format => default_format,
           :version        => option(:version),
@@ -277,7 +310,7 @@ module Rack
         # Add middleware for format validation.
         builder.use Rack::API::Middleware::Format, default_format, option(:formats)
 
-        # Add middlewares to executation stack.
+        # Add middlewares to execution stack.
         option(:middlewares, :merge).each {|middleware| builder.use(*middleware)}
 
         # Apply helpers to app.
