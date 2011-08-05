@@ -1,10 +1,10 @@
 module Rack
   class API
-    class App
+    class Controller
       # Registered content types. If you want to use
       # a custom formatter that is not listed here,
       # you have to manually add it. Otherwise,
-      # Rack::API::App::DEFAULT_MIME_TYPE will be used
+      # Rack::API::Controller::DEFAULT_MIME_TYPE will be used
       # as the content type.
       #
       MIME_TYPES = {
@@ -19,7 +19,7 @@ module Rack
       }
 
       # Default content type. Will be used when a given format
-      # hasn't been registered on Rack::API::App::MIME_TYPES.
+      # hasn't been registered on Rack::API::Controller::MIME_TYPES.
       #
       DEFAULT_MIME_TYPE = "application/octet-stream"
 
@@ -169,7 +169,7 @@ module Rack
 
       # Return response content type based on extension.
       # If you're using an unknown extension that wasn't registered on
-      # Rack::API::App::MIME_TYPES, it will return Rack::API::App::DEFAULT_MIME_TYPE,
+      # Rack::API::Controller::MIME_TYPES, it will return Rack::API::Controller::DEFAULT_MIME_TYPE,
       # which defaults to <tt>application/octet-stream</tt>.
       #
       def content_type

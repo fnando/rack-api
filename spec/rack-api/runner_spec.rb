@@ -50,7 +50,7 @@ describe Rack::API::Runner do
       :handler => proc {}
     }
 
-    Rack::API::App.should_receive(:new).with(hash_including(expected)).once
+    Rack::API::Controller.should_receive(:new).with(hash_including(expected)).once
     subject.version("v1") do
       respond_to :fffuuu
       prefix "api"

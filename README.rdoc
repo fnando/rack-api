@@ -127,7 +127,7 @@ Your <tt>Helpers</tt> module may look like this:
 == Helpers
 
 Every Rack::API action has several helper methods available through the
-Rack::API::App class. Here's some of them:
+Rack::API::Controller class. Here's some of them:
 
 === logger
 

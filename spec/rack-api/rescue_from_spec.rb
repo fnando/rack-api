@@ -62,7 +62,7 @@ describe Rack::API, "Rescue from exceptions" do
     end
 
     get "/v1/500"
-    last_response.body.should == "Rack::API::App"
+    last_response.body.should == "Rack::API::Controller"
   end
 
   it "yields the exception object" do

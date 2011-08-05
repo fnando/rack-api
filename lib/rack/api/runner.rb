@@ -87,7 +87,7 @@ module Rack
       end
 
       # Define the server endpoint. Will be used if you call the method
-      # Rack::API::App#url_for.
+      # Rack::API::Controller#url_for.
       #
       # The following options are supported:
       #
@@ -259,7 +259,7 @@ module Rack
       end
 
       def build_app(handler) # :nodoc:
-        app = App.new({
+        app = Controller.new({
           :handler        => handler,
           :default_format => default_format,
           :version        => option(:version),

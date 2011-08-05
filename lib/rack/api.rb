@@ -2,13 +2,14 @@ require "rack"
 require "rack/mount"
 require "active_support/hash_with_indifferent_access"
 require "active_support/core_ext/object/to_query"
+require "active_support/core_ext/string/inflections"
 require "json"
 require "logger"
 require "forwardable"
 
 module Rack
   class API
-    autoload :App         , "rack/api/app"
+    autoload :Controller  , "rack/api/controller"
     autoload :Formatter   , "rack/api/formatter"
     autoload :Middleware  , "rack/api/middleware"
     autoload :Runner      , "rack/api/runner"

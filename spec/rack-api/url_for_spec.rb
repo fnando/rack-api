@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Rack::API::App, "#url_for" do
-  subject { Rack::API::App.new(
+describe Rack::API::Controller, "#url_for" do
+  subject { Rack::API::Controller.new(
     :version => "v1",
     :url_options => {},
     :env => Rack::MockRequest.env_for("/v1")
@@ -22,7 +22,7 @@ describe Rack::API::App, "#url_for" do
   end
 
   it "sets default url options hash" do
-    subject = Rack::API::App.new(:version => "v1", :url_options => nil, :env => Rack::MockRequest.env_for("/v1"))
+    subject = Rack::API::Controller.new(:version => "v1", :url_options => nil, :env => Rack::MockRequest.env_for("/v1"))
 
     expect {
       subject.url_for(:things, 1)
@@ -59,13 +59,13 @@ describe Rack::API::App, "#url_for" do
 
   it "uses host from request" do
     env = Rack::MockRequest.env_for("/v1", "SERVER_NAME" => "mysite.com")
-    subject = Rack::API::App.new(:version => "v1", :env => env)
+    subject = Rack::API::Controller.new(:version => "v1", :env => env)
     subject.url_for.should == "http://mysite.com/v1"
   end
 
   it "uses port from request" do
     env = Rack::MockRequest.env_for("/v1", "SERVER_PORT" => "2345")
-    subject = Rack::API::App.new(:version => "v1", :env => env)
+    subject = Rack::API::Controller.new(:version => "v1", :env => env)
     subject.url_for.should == "http://example.org:2345/v1"
   end
 end

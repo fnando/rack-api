@@ -39,7 +39,7 @@ describe Rack::API, "Format" do
     end
 
     it "is set to the first respond_to value" do
-      Rack::API::App::MIME_TYPES["fffuuu"] = "application/x-fffuuu"
+      Rack::API::Controller::MIME_TYPES["fffuuu"] = "application/x-fffuuu"
 
       Rack::API.app do
         version :v2 do
