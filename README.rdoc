@@ -24,11 +24,51 @@ Create web app APIs that respond to one or more formats using an elegant DSL.
     end
   end
 
+=== Starting a server with Rack
+
+To run Rack::API through Rack (`config.ru`), you just need to provide your class. If
+you're using the DSL format, you need to provide the Rack::API class.
+
+  require "rack/api"
+  run Rack::API
+
+Otherwise, just provide your custom class.
+
+  require "rack/api"
+
+  class MyApp < Rack::API
+    get "/" do
+      {:message => "Hello World"}
+    end
+  end
+
+  run MyApp
+
+Now, you can execute `rackup` and your app will be available through the 9292 port.
+
+  $ rackup -p 3000
+  [2011-08-05 20:38:11] INFO  WEBrick 1.3.1
+  [2011-08-05 20:38:11] INFO  ruby 1.9.3 (2011-07-31) [x86_64-darwin11.0.0]
+  [2011-08-05 20:38:11] INFO  WEBrick::HTTPServer#start: pid=95318 port=3000
+
+  $ curl localhost:3000
+  {"message" => "Hello World"}
+
+You can also run other application servers that recognize Rack, like Thin.
+
+  $ thin -R config.ru start
+  >> Thin web server (v1.2.11 codename Bat-Shit Crazy)
+  >> Maximum connections set to 1024
+  >> Listening on 0.0.0.0:3000, CTRL+C to stop
+
+  $ curl localhost:9292
+  {"message" => "Hello World"}
+
 === Rails Integration
 
 First, set up your Gemfile like this:
 
-  gem "rack-api", "~> 0.1.0", :require => "rack/api"
+  gem "rack-api", "~> 1.0", :require => "rack/api"
 
 Create your API somewhere. In this example, we'll add it to <tt>lib/api.rb</tt>.
 

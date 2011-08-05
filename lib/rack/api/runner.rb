@@ -6,6 +6,7 @@ module Rack
       DELEGATE_METHODS = %w[
         version use prefix basic_auth rescue_from
         helper respond_to default_url_options
+        get post put delete head
       ]
 
       attr_accessor :settings
