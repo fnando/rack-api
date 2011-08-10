@@ -144,4 +144,30 @@ describe Rack::API, "Format" do
       last_response.body.should == "ZOMG! Fffuuu!"
     end
   end
+
+  context "formatter helper methods" do
+    it "sets params" do
+      Rack::API.app do
+        version :v2 do
+          respond_to :json
+          get("/") { params }
+        end
+      end
+
+      get "/v2", :foo => "bar"
+      last_response.body.should == {foo: "bar"}.to_json
+    end
+
+    it "sets env" do
+      Rack::API.app do
+        version :v2 do
+          respond_to :json
+          get("/") { env }
+        end
+      end
+
+      get "/v2", :foo => "bar"
+      JSON.load(last_response.body)["REQUEST_METHOD"].should == "GET"
+    end
+  end
 end

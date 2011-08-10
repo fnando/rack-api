@@ -228,7 +228,7 @@ module Rack
         formatter_name = format.split("_").collect {|word| word[0,1].upcase + word[1,word.size].downcase}.join("")
 
         if Rack::API::Formatter.const_defined?(formatter_name)
-          formatter = Rack::API::Formatter.const_get(formatter_name).new(response, params)
+          formatter = Rack::API::Formatter.const_get(formatter_name).new(response, env, params)
           formatter.to_format
         elsif response.respond_to?("to_#{format}")
           response.__send__("to_#{format}")
