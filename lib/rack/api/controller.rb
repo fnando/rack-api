@@ -53,7 +53,7 @@ module Rack
       #
       attr_accessor :rescuers
 
-      def initialize(options)
+      def initialize(options = {})
         options.each do |name, value|
           instance_variable_set("@#{name}", value)
         end
