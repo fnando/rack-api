@@ -1,3 +1,7 @@
+require "bundler"
+Bundler.setup(:default, :development)
+Bundler.require
+
 require "rack/test"
 require "rspec"
 require "rack/api"
