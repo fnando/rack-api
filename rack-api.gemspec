@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "rack/api"
+require "rack/api/version"
 
 Gem::Specification.new do |s|
   s.name        = "rack-api"
@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rack", ">= 1.0.0"
   s.add_dependency "rack-mount", ">= 0.6.0"
-  s.add_dependency "activesupport", ">= 3.0.0"
+  s.add_dependency "activesupport", ">= 3.0"
+  s.add_dependency "i18n"
   s.add_development_dependency "rspec", "~> 2.6"
   s.add_development_dependency "rack-test", "~> 0.5.7"
   s.add_development_dependency "redis", "~> 2.2.0"
