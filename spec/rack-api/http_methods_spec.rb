@@ -9,6 +9,7 @@ describe Rack::API, "HTTP Methods" do
         put("put") { {:put => true} }
         delete("delete") { {:delete => true} }
         head("head") { {:head => true} }
+        patch("patch") { {:patch => true} }
       end
     end
   end

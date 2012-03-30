@@ -1,12 +1,12 @@
 module Rack
   class API
     class Runner
-      HTTP_METHODS = %w[get post put delete head]
+      HTTP_METHODS = %w[get post put delete head patch]
 
       DELEGATE_METHODS = %w[
         version use prefix basic_auth rescue_from
         helper respond_to default_url_options
-        get post put delete head
+        get post put delete head patch
       ]
 
       attr_accessor :settings
@@ -214,7 +214,7 @@ module Rack
       # path are recognized.
       #
       # You're better off using all verb shortcut methods. Implemented verbs are
-      # +get+, +post+, +put+, +delete+ and +head+.
+      # +get+, +post+, +put+, +delete+, +head+ and +patch+.
       #
       #   class MyAPI < Rack::API
       #     version "v1" do

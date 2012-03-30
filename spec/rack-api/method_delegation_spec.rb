@@ -15,4 +15,5 @@ describe Rack::API, "delegators" do
   it { should respond_to(:put) }
   it { should respond_to(:delete) }
   it { should respond_to(:head) }
+  it { should respond_to(:patch) }
 end
