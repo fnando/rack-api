@@ -7,6 +7,8 @@ describe Rack::API::Runner do
     subject.should respond_to(:put)
     subject.should respond_to(:delete)
     subject.should respond_to(:head)
+    subject.should respond_to(:options)
+    subject.should respond_to(:patch)
   end
 
   it "sets available formats" do
