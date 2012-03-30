@@ -54,7 +54,7 @@ describe Rack::API::Controller, "#url_for" do
 
   it "adds query string" do
     actual = subject.url_for(:format => :json, :filters => [:name, :age])
-    actual.should == "http://example.org/v1?filters[]=name&filters[]=age&format=json"
+    actual.should == "http://example.org/v1?filters%5B%5D=name&filters%5B%5D=age&format=json"
   end
 
   it "uses host from request" do

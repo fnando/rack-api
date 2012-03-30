@@ -250,7 +250,9 @@ module Rack
       # your world will explode.
       #
       def route(method, path, requirements = {}, &block)
-        path = Rack::Mount::Strexp.compile mount_path(path), requirements, %w[ / . ? ]
+        separator = requirements.delete(:separator) { %w[ / . ? ] }
+
+        path = Rack::Mount::Strexp.compile mount_path(path), requirements, separator
         controller_class = Controller
 
         if requirements[:to]
@@ -274,7 +276,7 @@ module Rack
       #
       #   rescue_from ActiveRecord::RecordNotFound, :status => 404
       #   rescue_from Exception, :status => 500
-      #   rescue_from Exception do
+      #   rescue_from Exception do |error|
       #     $logger.error error.inspect
       #     [500, {"Content-Type" => "text/plain"}, []]
       #   end
