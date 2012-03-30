@@ -1,12 +1,12 @@
 module Rack
   class API
     class Runner
-      HTTP_METHODS = %w[get post put delete head patch]
+      HTTP_METHODS = %w[get post put delete head patch options]
 
       DELEGATE_METHODS = %w[
         version use prefix basic_auth rescue_from
         helper respond_to default_url_options
-        get post put delete head patch
+        get post put delete head patch options
       ]
 
       attr_accessor :settings

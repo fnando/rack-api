@@ -3,6 +3,10 @@ require "spec_helper"
 describe Rack::API, "delegators" do
   subject { Rack::API }
 
+  specify "sanity check for delegate methods" do
+    Rack::API::Runner::DELEGATE_METHODS.size.should == 15
+  end
+
   it { should respond_to(:version) }
   it { should respond_to(:use) }
   it { should respond_to(:prefix) }
@@ -16,4 +20,5 @@ describe Rack::API, "delegators" do
   it { should respond_to(:delete) }
   it { should respond_to(:head) }
   it { should respond_to(:patch) }
+  it { should respond_to(:options) }
 end

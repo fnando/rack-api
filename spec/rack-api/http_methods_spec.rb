@@ -10,6 +10,7 @@ describe Rack::API, "HTTP Methods" do
         delete("delete") { {:delete => true} }
         head("head") { {:head => true} }
         patch("patch") { {:patch => true} }
+        options("options") { {:options => true} }
       end
     end
   end
