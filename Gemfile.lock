@@ -8,7 +8,7 @@ GIT
 PATH
   remote: .
   specs:
-    rack-api (1.0.2)
+    rack-api (1.1.0)
       activesupport (>= 3.0)
       i18n
       rack (>= 1.0.0)
